@@ -1,0 +1,7 @@
+*__pycache__
+*.stl
+*.obj
+*.pkl
+
+!share/mesh/example.stl
+!share/mesh/robotiq_140_collision.stl
