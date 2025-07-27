@@ -3,5 +3,7 @@
 *.obj
 *.pkl
 
-!share/mesh/example.stl
-!share/mesh/robotiq_140_collision.stl
+!share/obj_mesh/example.stl
+!share/pcjson/example.json
+!share/tool_mesh/robotiq_140_collision.stl
+!share/tool_mesh/suction_cup.stl

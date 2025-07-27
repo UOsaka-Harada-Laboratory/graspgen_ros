@@ -9,8 +9,8 @@ def generate_launch_description():
 
     config_arg = DeclareLaunchArgument(
         'config',
-        default_value='example_planner.yaml',
-        description='YAML file name for grasp planning parameters.'
+        default_value='example_pointcloud_antipodal_generator.yaml',
+        description='YAML file name for grasp generator parameters.'
     )
 
     config_path = PathJoinSubstitution([
@@ -49,8 +49,8 @@ def generate_launch_description():
 
         launch_ros.actions.Node(
             package='graspgen_tutorials',
-            executable='grasp_planning_service',
-            name='grasp_planning_server',
+            executable='pointcloud_graspgen_service',
+            name='graspgen_server',
             parameters=[config_path, {'config_filename': LaunchConfiguration('config')}],
             output='screen'
         )

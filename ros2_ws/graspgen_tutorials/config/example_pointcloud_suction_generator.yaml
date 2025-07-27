@@ -1,0 +1,13 @@
+graspgen_server:
+  ros__parameters:
+    object_pointcloud_path: "/share/pcjson/example.json"
+    gripper_name: "suction_cup"
+    gripper_config_path: "/ros2_ws/src/GraspGen/models/checkpoints/graspgen_single_suction_cup_30mm.yml"
+    gripper_mesh_path: "/share/tool_mesh/suction_cup.stl"
+    save_results: true
+    grasp_result_path: "/share/grasp_result/example_pointcloud_suction.yaml"
+    grasp_threshold: -1.0
+    num_grasps: 100
+    return_topk: true
+    topk_num_grasps: 10
+    no_visulaization: false

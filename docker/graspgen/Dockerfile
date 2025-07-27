@@ -141,16 +141,22 @@ WORKDIR /ros2_ws/src/GraspGen
 RUN pip install -e .
 
 # ---- Python dependencies ----
-RUN pip install spconv
+RUN pip install spconv-cu120
 RUN pip uninstall -y numpy scikit-learn
 RUN pip install numpy==1.24.4
 RUN pip install --no-cache-dir scikit-learn
 
 # ---- Developer convenience ----
 WORKDIR /ros2_ws/
+
+RUN echo "cd /ros2_ws/src/graspgen_tutorials/script && python obj2stl.py /ros2_ws/src/GraspGen/assets/.../XXX.obj /share/tool_mesh/XXX.stl" >> ~/.bash_history
+RUN echo "cd /ros2_ws/src/graspgen_tutorials/script && python stl2pcjson.py /share/obj_mesh/XXX.stl /share/pcjson/XXX.json" >> ~/.bash_history
+
 RUN echo "byobu" >> ~/.bash_history
 RUN echo "colcon build --symlink-install --executor sequential" >> ~/.bash_history
 RUN echo "meshcat-server" >> ~/.bash_history
-RUN echo "cd /ros2_ws/src/GraspGen && python scripts/demo_object_mesh.py --mesh_file /share/mesh/XXX.stl --mesh_scale 1.0 --gripper_config models/checkpoints/graspgen_robotiq_2f_140.yml --output_file /share/grasp_result/XXX.yml" >> ~/.bash_history
-RUN echo "ros2 launch graspgen_tutorials plan_grasp_launch.py config:=/ros2_ws/src/graspgen_tutorials/config/example_planner.yaml" >> ~/.bash_history
-RUN echo "ros2 service call /plan_grasp std_srvs/srv/Empty" >> ~/.bash_history
+RUN echo "ros2 launch graspgen_tutorials mesh_graspgen_launch.py config:=/ros2_ws/src/graspgen_tutorials/config/example_mesh_antipodal_generator.yaml" >> ~/.bash_history
+RUN echo "ros2 launch graspgen_tutorials mesh_graspgen_launch.py config:=/ros2_ws/src/graspgen_tutorials/config/example_mesh_suction_generator.yaml" >> ~/.bash_history
+RUN echo "ros2 launch graspgen_tutorials pointcloud_graspgen_launch.py config:=/ros2_ws/src/graspgen_tutorials/config/example_pointcloud_antipodal_generator.yaml" >> ~/.bash_history
+RUN echo "ros2 launch graspgen_tutorials pointcloud_graspgen_launch.py config:=/ros2_ws/src/graspgen_tutorials/config/example_pointcloud_antipodal_generator.yaml" >> ~/.bash_history
+RUN echo "ros2 service call /generate_grasp std_srvs/srv/Empty" >> ~/.bash_history

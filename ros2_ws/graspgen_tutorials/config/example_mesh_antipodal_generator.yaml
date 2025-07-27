@@ -1,15 +1,15 @@
-grasp_planning_server:
+graspgen_server:
   ros__parameters:
-    object_mesh_path: "/share/mesh/example.stl"
+    object_mesh_path: "/share/obj_mesh/example.stl"
     gripper_name: "robotiq140"
     gripper_config_path: "/ros2_ws/src/GraspGen/models/checkpoints/graspgen_robotiq_2f_140.yml"
-    gripper_mesh_path: "/share/mesh/robotiq_140_collision.stl"
+    gripper_mesh_path: "/share/tool_mesh/robotiq_140_collision.stl"
     save_results: true
-    grasp_result_path: "/share/grasp_result/example.yaml"
+    grasp_result_path: "/share/grasp_result/example_mesh_antipodal.yaml"
     grasp_threshold: -1.0
     num_grasps: 300
     return_topk: true
     topk_num_grasps: 10
     mesh_scale: 1.0
     num_sample_points: 3000
-    no_visulaization: true
+    no_visulaization: false

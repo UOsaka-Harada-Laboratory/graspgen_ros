@@ -31,15 +31,39 @@ ROS2 example nodes and Docker environment for [GraspGen](https://github.com/NVla
 ## Usage with docker
 
 1. Construct docker container from the image built
-    ```bash
-    docker compose up
-    ```
-2. Execute a demo script
-    ```bash
-    ./utils/demo.sh
-    ```
+    ```bash  
+    docker compose up  
+    ```  
 
-<img src=image/demo.png width=500>  
+2. Execute a demo script
+
+### Antipodal grasp generation for object mesh
+  ```bash  
+  ./utils/mesh_antipodal_demo.sh
+  ```  
+
+<img src=image/mesh_antipodal_demo.png width=500>  
+
+### Suction grasp generation for object mesh
+  ```bash  
+  ./utils/mesh_suction_demo.sh  
+  ```  
+
+<img src=image/mesh_suction_demo.png width=500>  
+
+### Antipodal grasp generation for object point cloud
+  ```bash  
+  ./utils/pointcloud_antipodal_demo.sh  
+  ```
+
+<img src=image/pointcloud_antipodal_demo.png width=500>  
+
+### Suction grasp generation for object point cloud
+  ```bash  
+  ./utils/pointcloud_suction_demo.sh  
+  ```  
+
+<img src=image/pointcloud_suction_demo.png width=500>  
 
 ## Author / Contributor
 

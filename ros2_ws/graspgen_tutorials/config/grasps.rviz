@@ -59,188 +59,19 @@ Visualization Manager:
         Value: /grasp_markers
       Value: true
     - Class: rviz_default_plugins/TF
-      Enabled: true
+      Enabled: false
       Frame Timeout: 15
       Frames:
         All Enabled: true
-        base_link:
-          Value: true
-        grasp_0:
-          Value: true
-        grasp_1:
-          Value: true
-        grasp_10:
-          Value: true
-        grasp_11:
-          Value: true
-        grasp_12:
-          Value: true
-        grasp_13:
-          Value: true
-        grasp_14:
-          Value: true
-        grasp_15:
-          Value: true
-        grasp_16:
-          Value: true
-        grasp_17:
-          Value: true
-        grasp_18:
-          Value: true
-        grasp_19:
-          Value: true
-        grasp_2:
-          Value: true
-        grasp_20:
-          Value: true
-        grasp_21:
-          Value: true
-        grasp_22:
-          Value: true
-        grasp_23:
-          Value: true
-        grasp_24:
-          Value: true
-        grasp_25:
-          Value: true
-        grasp_26:
-          Value: true
-        grasp_27:
-          Value: true
-        grasp_28:
-          Value: true
-        grasp_29:
-          Value: true
-        grasp_3:
-          Value: true
-        grasp_30:
-          Value: true
-        grasp_31:
-          Value: true
-        grasp_32:
-          Value: true
-        grasp_33:
-          Value: true
-        grasp_34:
-          Value: true
-        grasp_35:
-          Value: true
-        grasp_36:
-          Value: true
-        grasp_37:
-          Value: true
-        grasp_38:
-          Value: true
-        grasp_39:
-          Value: true
-        grasp_4:
-          Value: true
-        grasp_5:
-          Value: true
-        grasp_6:
-          Value: true
-        grasp_7:
-          Value: true
-        grasp_8:
-          Value: true
-        grasp_9:
-          Value: true
-        object:
-          Value: true
-        world:
-          Value: true
       Marker Scale: 0.5
       Name: TF
       Show Arrows: true
       Show Axes: true
       Show Names: false
       Tree:
-        world:
-          base_link:
-            {}
-          object:
-            grasp_0:
-              {}
-            grasp_1:
-              {}
-            grasp_10:
-              {}
-            grasp_11:
-              {}
-            grasp_12:
-              {}
-            grasp_13:
-              {}
-            grasp_14:
-              {}
-            grasp_15:
-              {}
-            grasp_16:
-              {}
-            grasp_17:
-              {}
-            grasp_18:
-              {}
-            grasp_19:
-              {}
-            grasp_2:
-              {}
-            grasp_20:
-              {}
-            grasp_21:
-              {}
-            grasp_22:
-              {}
-            grasp_23:
-              {}
-            grasp_24:
-              {}
-            grasp_25:
-              {}
-            grasp_26:
-              {}
-            grasp_27:
-              {}
-            grasp_28:
-              {}
-            grasp_29:
-              {}
-            grasp_3:
-              {}
-            grasp_30:
-              {}
-            grasp_31:
-              {}
-            grasp_32:
-              {}
-            grasp_33:
-              {}
-            grasp_34:
-              {}
-            grasp_35:
-              {}
-            grasp_36:
-              {}
-            grasp_37:
-              {}
-            grasp_38:
-              {}
-            grasp_39:
-              {}
-            grasp_4:
-              {}
-            grasp_5:
-              {}
-            grasp_6:
-              {}
-            grasp_7:
-              {}
-            grasp_8:
-              {}
-            grasp_9:
-              {}
+        {}
       Update Interval: 0
-      Value: true
+      Value: false
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -287,16 +118,16 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 0.8087083101272583
+      Distance: 0.7014153599739075
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: -0.08131042867898941
-        Y: 0.08580101281404495
-        Z: 0.09177560359239578
+        X: -0.024175191298127174
+        Y: 0.008578254841268063
+        Z: 0.07199504971504211
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false

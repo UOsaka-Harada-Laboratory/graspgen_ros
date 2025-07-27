@@ -1,6 +1,7 @@
 import sys
 import trimesh
 
+
 def convert_obj_to_stl(input_path, output_path=None):
     mesh = trimesh.load(input_path, force='mesh')
 
@@ -9,6 +10,7 @@ def convert_obj_to_stl(input_path, output_path=None):
 
     mesh.export(output_path)
     print(f"Converted: {input_path} → {output_path}")
+
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:
