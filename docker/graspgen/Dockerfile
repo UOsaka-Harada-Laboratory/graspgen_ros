@@ -134,7 +134,7 @@ RUN cd /ros2_ws/src/GraspGenModels/ && touch COLCON_IGNORE
 
 # ---- pointnet2_ops build ----
 WORKDIR /ros2_ws/src/GraspGen/pointnet2_ops
-RUN pip install .
+RUN pip install --no-build-isolation -v .
 
 # ---- GraspGen install ----
 WORKDIR /ros2_ws/src/GraspGen
