@@ -33,6 +33,7 @@ setup(
         'console_scripts': [
             'mesh_graspgen_service = graspgen_tutorials.mesh_graspgen_service:main',
             'pointcloud_graspgen_service = graspgen_tutorials.pointcloud_graspgen_service:main',
+            'pointcloud_collisionfree_graspgen_service = graspgen_tutorials.pointcloud_collisionfree_graspgen_service:main',
         ],
     },
     include_package_data=True,

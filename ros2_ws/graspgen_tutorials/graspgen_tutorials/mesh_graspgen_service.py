@@ -26,7 +26,7 @@ class GraspGenServer(Node):
     def __init__(self):
         super().__init__('graspgen_server')
 
-        self.declare_parameter("object_mesh_path", "")
+        self.declare_parameter("object_pointcloud_path", "/share/pcjson/example.json")
         self.declare_parameter("gripper_name", "")
         self.declare_parameter("gripper_config_path", "")
         self.declare_parameter("gripper_mesh_path", "")
