@@ -12,6 +12,7 @@ import tf2_ros
 import trimesh.transformations as tra
 
 from grasp_gen.grasp_server import GraspGenSampler, load_grasp_cfg
+from grasp_gen.dataset.eval_utils import save_to_isaac_grasp_format
 from grasp_gen.utils.meshcat_utils import (
     create_visualizer,
     get_color_from_score,
