@@ -58,6 +58,12 @@ ROS2 example nodes and Docker environment for [GraspGen](https://github.com/NVla
 
 <img src=image/pointcloud_antipodal_demo.png width=500>  
 
+  ```bash  
+  ./utils/pointcloud_collisionfree_antipodal_demo.sh  
+  ```
+
+<img src=image/pointcloud_collisionfree_antipodal_demo.png width=500>  
+
 ### Suction grasp generation for object point cloud
   ```bash  
   ./utils/pointcloud_suction_demo.sh  
