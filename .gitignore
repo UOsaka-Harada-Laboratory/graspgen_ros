@@ -5,8 +5,6 @@
 
 !share/obj_mesh/example.stl
 !share/pcjson/example.json
-!share/tool_mesh/robotiq_140_collision.stl
-!share/tool_mesh/suction_cup.stl
 
 *.claude/
 CLAUDE.md
