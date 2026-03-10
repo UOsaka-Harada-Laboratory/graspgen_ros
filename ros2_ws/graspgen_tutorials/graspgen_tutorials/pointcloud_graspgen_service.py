@@ -82,7 +82,8 @@ class GraspGenServer(Node):
         gripper_name = grasp_cfg.data.gripper_name
         grasp_sampler = GraspGenSampler(grasp_cfg)
 
-        data = json.load(open(self.pointcloud_path, "rb"))
+        with open(self.pointcloud_path, "rb") as f:
+            data = json.load(f)
         pc = np.array(data["pc"])
         pc_color = np.array(data["pc_color"])
         grasps = np.array(data["grasp_poses"])
@@ -92,7 +93,7 @@ class GraspGenServer(Node):
             pc, grasps, grasp_conf
         )
 
-        if not self.no_visualization and pc is not None:
+        if not self.no_visualization and len(pc) > 0:
             visualize_pointcloud(vis, "pc", pc_centered, pc_color, size=0.0025)
 
         pc_filtered, pc_removed = point_cloud_outlier_removal(
@@ -100,7 +101,8 @@ class GraspGenServer(Node):
         )
         pc_filtered = pc_filtered.numpy()
         pc_removed = pc_removed.numpy()
-        visualize_pointcloud(vis, "pc_removed", pc_removed, [255, 0, 0], size=0.003)
+        if not self.no_visualization:
+            visualize_pointcloud(vis, "pc_removed", pc_removed, [255, 0, 0], size=0.003)
 
         grasps_inferred, grasp_conf_inferred = GraspGenSampler.run_inference(
             pc_filtered,
@@ -125,15 +127,16 @@ class GraspGenServer(Node):
                 f"Inferred {len(grasps_inferred)} grasps, with scores ranging from {grasp_conf_inferred.min():.3f} - {grasp_conf_inferred.max():.3f}"
             )
 
-            for j, grasp in enumerate(grasps_inferred):
-                visualize_grasp(
-                    vis,
-                    f"grasps_objectpc_filtered/{j:03d}/grasp",
-                    grasp,
-                    color=scores_inferred[j],
-                    gripper_name=gripper_name,
-                    linewidth=0.6,
-                )
+            if not self.no_visualization:
+                for j, grasp in enumerate(grasps_inferred):
+                    visualize_grasp(
+                        vis,
+                        f"grasps_objectpc_filtered/{j:03d}/grasp",
+                        grasp,
+                        color=scores_inferred[j],
+                        gripper_name=gripper_name,
+                        linewidth=0.6,
+                    )
 
             self.publish_tf_and_marker(grasps_inferred, grasp_conf_inferred, pc_centered, pc_color)
 
@@ -177,7 +180,7 @@ class GraspGenServer(Node):
 
         marker_array.markers.append(obj_pc_marker)
 
-        for i, (g, s) in enumerate(zip(grasps, scores)):
+        for i, g in enumerate(grasps):
             trans = g[:3, 3].tolist()
             q = tra.quaternion_from_matrix(g[:3, :3])
             w = float(q[0])

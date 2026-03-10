@@ -186,7 +186,7 @@ class GraspGenServer(Node):
         obj_mesh_marker.mesh_use_embedded_materials = True
         marker_array.markers.append(obj_mesh_marker)
 
-        for i, (g, s) in enumerate(zip(grasps, scores)):
+        for i, g in enumerate(grasps):
             trans = g[:3, 3].tolist()
             q = tra.quaternion_from_matrix(g[:3, :3])
             w = float(q[0])
