@@ -8,9 +8,12 @@ services:
         environment:
             - NVIDIA_VISIBLE_DEVICES=all
             - NVIDIA_DRIVER_CAPABILITIES=all
+            # Driver 535 natively supports CUDA 12.2; this container is CUDA 12.6.
+            # Bypass the strict cuda>=12.6 check so the container launches under
+            # Minor Version Compatibility mode.
+            - NVIDIA_DISABLE_REQUIRE=true
             - DISPLAY=${DISPLAY}
             - QT_X11_NO_MITSHM=1
-            - ROS_HOSTNAME=localhost
             - RMW_IMPLEMENTATION=rmw_fastrtps_cpp
             - FASTDDS_SHM_DISABLE=1
             - ROS_DOMAIN_ID=0
@@ -21,5 +24,6 @@ services:
             - ./ros2_ws/graspgen_tutorials:/ros2_ws/src/graspgen_tutorials
         privileged: true
         tty: true
+        stdin_open: true
         network_mode: host
-        command: bash -c "source /opt/ros/humble/setup.bash && colcon build --symlink-install --executor sequential && source /ros2_ws/install/setup.bash && bash"
+        command: bash -c "source /opt/ros/jazzy/setup.bash && colcon build --symlink-install --executor sequential && source /ros2_ws/install/setup.bash && bash"

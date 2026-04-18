@@ -6,5 +6,8 @@
 !share/obj_mesh/example.stl
 !share/pcjson/example.json
 
+# Grasp inference outputs — non-deterministic, differ every run.
+share/grasp_result/*.yaml
+
 *.claude/
 CLAUDE.md
