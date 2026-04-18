@@ -32,11 +32,9 @@ class GraspGenServer(Node):
         self.declare_parameter("gripper_name", "")
         self.declare_parameter("gripper_config_path", "")
         self.declare_parameter("gripper_mesh_path", "")
-        self.declare_parameter("save_results", True)
         self.declare_parameter("grasp_result_path", "/tmp/grasp_result.yaml")
         self.declare_parameter("grasp_threshold", -1.0)
         self.declare_parameter("num_grasps", 500)
-        self.declare_parameter("return_topk", True)
         self.declare_parameter("topk_num_grasps", 10)
         self.declare_parameter("collision_threshold", 0.02)  # 0.02 = 2mm
         self.declare_parameter("max_scene_points", 8192)
@@ -47,11 +45,9 @@ class GraspGenServer(Node):
         self.gripper_name = self.get_parameter("gripper_name").get_parameter_value().string_value
         self.gripper_config_path = self.get_parameter("gripper_config_path").get_parameter_value().string_value
         self.gripper_mesh_path = self.get_parameter("gripper_mesh_path").get_parameter_value().string_value
-        self.save_results = self.get_parameter("save_results").get_parameter_value().bool_value
         self.output_file = self.get_parameter("grasp_result_path").get_parameter_value().string_value
         self.grasp_threshold = self.get_parameter("grasp_threshold").get_parameter_value().double_value
         self.num_grasps = self.get_parameter("num_grasps").get_parameter_value().integer_value
-        self.return_topk = self.get_parameter("return_topk").get_parameter_value().bool_value
         self.topk_num_grasps = self.get_parameter("topk_num_grasps").get_parameter_value().integer_value
         self.collision_threshold = self.get_parameter("collision_threshold").get_parameter_value().double_value
         self.max_scene_points = self.get_parameter("max_scene_points").get_parameter_value().integer_value
@@ -238,7 +234,7 @@ class GraspGenServer(Node):
                 )
 
             # Publish grasp object, and scene tfs and markers
-            self.publish_tf_and_marker(collision_free_grasps, colliding_grasps, pc_centered, object_colors_centered, scene_pc_centered, scene_colors_centered)
+            self.publish_tf_and_marker(collision_free_grasps, colliding_grasps, pc_centered, scene_pc_centered)
 
             if self.output_file != "":
                 self.get_logger().info(f"Saving predicted collision-free grasps to {self.output_file}")
@@ -253,7 +249,7 @@ class GraspGenServer(Node):
 
         return response
 
-    def publish_tf_and_marker(self, grasps, colliding_grasps, pc_centered, pc_color, scene_pc_centered, scene_color):
+    def publish_tf_and_marker(self, grasps, colliding_grasps, pc_centered, scene_pc_centered):
         tf_list = []
         marker_array = MarkerArray()
 

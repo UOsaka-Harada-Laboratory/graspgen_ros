@@ -30,11 +30,9 @@ class GraspGenServer(Node):
         self.declare_parameter("gripper_name", "")
         self.declare_parameter("gripper_config_path", "")
         self.declare_parameter("gripper_mesh_path", "")
-        self.declare_parameter("save_results", True)
         self.declare_parameter("grasp_result_path", "/tmp/grasp_result.yaml")
         self.declare_parameter("grasp_threshold", -1.0)
         self.declare_parameter("num_grasps", 500)
-        self.declare_parameter("return_topk", True)
         self.declare_parameter("topk_num_grasps", 10)
         self.declare_parameter("no_visualization", False)
 
@@ -42,11 +40,9 @@ class GraspGenServer(Node):
         self.gripper_name = self.get_parameter("gripper_name").get_parameter_value().string_value
         self.gripper_config_path = self.get_parameter("gripper_config_path").get_parameter_value().string_value
         self.gripper_mesh_path = self.get_parameter("gripper_mesh_path").get_parameter_value().string_value
-        self.save_results = self.get_parameter("save_results").get_parameter_value().bool_value
         self.output_file = self.get_parameter("grasp_result_path").get_parameter_value().string_value
         self.grasp_threshold = self.get_parameter("grasp_threshold").get_parameter_value().double_value
         self.num_grasps = self.get_parameter("num_grasps").get_parameter_value().integer_value
-        self.return_topk = self.get_parameter("return_topk").get_parameter_value().bool_value
         self.topk_num_grasps = self.get_parameter("topk_num_grasps").get_parameter_value().integer_value
         self.no_visualization = self.get_parameter("no_visualization").get_parameter_value().bool_value
 
@@ -54,26 +50,6 @@ class GraspGenServer(Node):
         self.tf_broadcaster = tf2_ros.StaticTransformBroadcaster(self)
         self.graspgen_service = self.create_service(Empty, "generate_grasp", self.generate_grasp_callback)
         self.get_logger().info("Grasp generation service '/generate_grasp' ready.")
-
-    def process_point_cloud(self, pc, grasps, grasp_conf):
-        if len(grasp_conf) == 0:
-            self.get_logger().warn("grasp_conf is empty, skipping score range print.")
-            scores = []
-        else:
-            scores = get_color_from_score(grasp_conf, use_255_scale=True)
-            self.get_logger().info(f"Scores with min {grasp_conf.min():.3f} and max {grasp_conf.max():.3f}")
-
-        grasps = np.array(grasps)
-        if grasps.shape[0] > 0:
-            grasps[:, 3, 3] = 1
-
-        T_subtract_pc_mean = tra.translation_matrix(-pc.mean(axis=0))
-        pc_centered = tra.transform_points(pc, T_subtract_pc_mean)
-        grasps_centered = np.array(
-            [T_subtract_pc_mean @ np.array(g) for g in grasps.tolist()]
-        ) if grasps.shape[0] > 0 else []
-
-        return pc_centered, grasps_centered, scores
 
     def generate_grasp_callback(self, request, response):
         self.get_logger().info(f"Running grasp generator on: {self.pointcloud_path}")
@@ -86,12 +62,9 @@ class GraspGenServer(Node):
             data = json.load(f)
         pc = np.array(data["pc"])
         pc_color = np.array(data["pc_color"])
-        grasps = np.array(data["grasp_poses"])
-        grasp_conf = np.array(data["grasp_conf"])
 
-        pc_centered, grasps_centered, scores = self.process_point_cloud(
-            pc, grasps, grasp_conf
-        )
+        T_subtract_pc_mean = tra.translation_matrix(-pc.mean(axis=0))
+        pc_centered = tra.transform_points(pc, T_subtract_pc_mean)
 
         if not self.no_visualization and len(pc) > 0:
             visualize_pointcloud(vis, "pc", pc_centered, pc_color, size=0.0025)
@@ -138,7 +111,7 @@ class GraspGenServer(Node):
                         linewidth=0.6,
                     )
 
-            self.publish_tf_and_marker(grasps_inferred, grasp_conf_inferred, pc_centered, pc_color)
+            self.publish_tf_and_marker(grasps_inferred, pc_centered)
 
             if self.output_file != "":
                 self.get_logger().info(f"Saving predicted grasps to {self.output_file}")
@@ -153,7 +126,7 @@ class GraspGenServer(Node):
 
         return response
 
-    def publish_tf_and_marker(self, grasps, scores, pc_centered, pc_color):
+    def publish_tf_and_marker(self, grasps, pc_centered):
         tf_list = []
         marker_array = MarkerArray()
 

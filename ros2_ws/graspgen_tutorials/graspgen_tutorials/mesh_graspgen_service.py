@@ -26,15 +26,13 @@ class GraspGenServer(Node):
     def __init__(self):
         super().__init__('graspgen_server')
 
-        self.declare_parameter("object_pointcloud_path", "/share/pcjson/example.json")
+        self.declare_parameter("object_mesh_path", "/share/obj_mesh/example.stl")
         self.declare_parameter("gripper_name", "")
         self.declare_parameter("gripper_config_path", "")
         self.declare_parameter("gripper_mesh_path", "")
-        self.declare_parameter("save_results", True)
         self.declare_parameter("grasp_result_path", "/tmp/grasp_result.yaml")
         self.declare_parameter("grasp_threshold", -1.0)
         self.declare_parameter("num_grasps", 500)
-        self.declare_parameter("return_topk", True)
         self.declare_parameter("topk_num_grasps", 10)
         self.declare_parameter("mesh_scale", 1.0)
         self.declare_parameter("num_sample_points", 2000)
@@ -44,11 +42,9 @@ class GraspGenServer(Node):
         self.gripper_name = self.get_parameter("gripper_name").get_parameter_value().string_value
         self.gripper_config_path = self.get_parameter("gripper_config_path").get_parameter_value().string_value
         self.gripper_mesh_path = self.get_parameter("gripper_mesh_path").get_parameter_value().string_value
-        self.save_results = self.get_parameter("save_results").get_parameter_value().bool_value
         self.output_file = self.get_parameter("grasp_result_path").get_parameter_value().string_value
         self.grasp_threshold = self.get_parameter("grasp_threshold").get_parameter_value().double_value
         self.num_grasps = self.get_parameter("num_grasps").get_parameter_value().integer_value
-        self.return_topk = self.get_parameter("return_topk").get_parameter_value().bool_value
         self.topk_num_grasps = self.get_parameter("topk_num_grasps").get_parameter_value().integer_value
         self.mesh_scale = self.get_parameter("mesh_scale").get_parameter_value().double_value
         self.num_sample_points = self.get_parameter("num_sample_points").get_parameter_value().integer_value
@@ -147,7 +143,7 @@ class GraspGenServer(Node):
                 [tra.inverse_matrix(T_subtract_pc_mean) @ g for g in grasps_inferred]
             )
 
-            self.publish_tf_and_marker(grasps_inferred, grasp_conf_inferred)
+            self.publish_tf_and_marker(grasps_inferred)
 
             # Save grasps to file only if output_file is not empty
             if self.output_file != "":
@@ -163,7 +159,7 @@ class GraspGenServer(Node):
 
         return response
 
-    def publish_tf_and_marker(self, grasps, scores):
+    def publish_tf_and_marker(self, grasps):
         tf_list = []
         marker_array = MarkerArray()
 
