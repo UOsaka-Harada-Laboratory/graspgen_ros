@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import sys
 import trimesh
 
@@ -14,7 +15,7 @@ def convert_obj_to_stl(input_path, output_path=None):
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:
-        print("Usage: python obj_to_stl.py input.obj [output.stl]")
+        print("Usage: obj2stl.py input.obj [output.stl]")
         sys.exit(1)
 
     input_file = sys.argv[1]

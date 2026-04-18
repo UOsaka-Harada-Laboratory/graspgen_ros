@@ -1,19 +1,22 @@
 <?xml version="1.0"?>
-<?xml-model href="http://download.ros.org/schema/package_format2.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
-<package format="2">
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
     <name>graspgen_tutorials</name>
     <version>0.0.0</version>
     <description>The graspgen_tutorials package</description>
     <maintainer email="taku8926@gmail.com">Takuya Kiyokawa</maintainer>
-    <license>BSD 3-Clause</license>
+    <license>BSD-3-Clause</license>
 
     <depend>rclpy</depend>
     <depend>std_msgs</depend>
     <depend>std_srvs</depend>
     <depend>geometry_msgs</depend>
+    <depend>visualization_msgs</depend>
     <depend>tf2_ros</depend>
     <depend>launch</depend>
     <depend>launch_ros</depend>
+
+    <exec_depend>rviz2</exec_depend>
 
     <export>
         <build_type>ament_python</build_type>

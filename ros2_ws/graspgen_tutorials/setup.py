@@ -12,9 +12,13 @@ setup(
     data_files=[
         ('share/ament_index/resource_index/packages', ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
-        (os.path.join('share', package_name, 'config'), glob('config/*.rviz')),
-        (os.path.join('share', package_name, 'config'), glob('config/*.yaml')),
+        (os.path.join('share', package_name, 'config'),
+         glob('config/*.rviz') + glob('config/*.yaml')),
         (os.path.join('share', package_name, 'launch'), glob('launch/*.py')),
+    ],
+    scripts=[
+        'script/obj2stl.py',
+        'script/stl2pcjson.py',
     ],
     zip_safe=True,
     author='Takuya Kiyokawa',
