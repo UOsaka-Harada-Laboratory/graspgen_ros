@@ -2,6 +2,7 @@ import numpy as np
 
 import rclpy
 from rclpy.node import Node
+from rclpy.qos import DurabilityPolicy, HistoryPolicy, QoSProfile, ReliabilityPolicy
 from std_srvs.srv import Empty
 
 from geometry_msgs.msg import TransformStamped
@@ -49,8 +50,14 @@ class GraspGenServer(Node):
         self.mesh_scale = self.get_parameter("mesh_scale").get_parameter_value().double_value
         self.num_sample_points = self.get_parameter("num_sample_points").get_parameter_value().integer_value
         self.no_visualization = self.get_parameter("no_visualization").get_parameter_value().bool_value
-
-        self.marker_pub = self.create_publisher(MarkerArray, "grasp_markers", 1)
+        latched_qos = QoSProfile(
+            reliability=ReliabilityPolicy.RELIABLE,
+            durability=DurabilityPolicy.TRANSIENT_LOCAL,
+            history=HistoryPolicy.KEEP_LAST,
+            depth=1,
+        )
+        self.marker_pub = self.create_publisher(
+            MarkerArray, "grasp_markers", latched_qos)
         self.tf_broadcaster = tf2_ros.StaticTransformBroadcaster(self)
         self.graspgen_service = self.create_service(Empty, "generate_grasp", self.generate_grasp_callback)
         self.get_logger().info("Grasp generation service '/generate_grasp' ready.")
