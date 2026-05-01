@@ -193,7 +193,7 @@ class GraspGenServer(Node):
             grasp_marker.color.r = 0.0
             grasp_marker.color.g = 1.0
             grasp_marker.color.b = 0.0
-            grasp_marker.color.a = 0.3
+            grasp_marker.color.a = 0.05
             grasp_marker.mesh_resource = 'file://' + self.gripper_mesh_path
             grasp_marker.mesh_use_embedded_materials = False
             marker_array.markers.append(grasp_marker)
