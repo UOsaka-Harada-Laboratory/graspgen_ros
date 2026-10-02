@@ -1,15 +1,14 @@
-FROM nvidia/cuda:12.6.3-cudnn-devel-ubuntu24.04
+FROM nvidia/cuda:12.8.1-cudnn-devel-ubuntu24.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV CUDA_HOME=/usr/local/cuda
 ENV PATH=$CUDA_HOME/bin:$PATH
 ENV LD_LIBRARY_PATH=$CUDA_HOME/lib64:$LD_LIBRARY_PATH
-ENV TORCH_CUDA_ARCH_LIST="8.6"
+ENV TORCH_CUDA_ARCH_LIST="12.0"
 
-# Remove CUDA Forward Compatibility libs. Consumer GPUs (Ampere RTX) don't
-# support forward compat; when driver 535 tries to load them on a CUDA 12.6
-# container, cudaGetDeviceCount() fails with error 804. Deleting the compat
-# directory forces Minor Version Compatibility mode which works for CUDA 12.x.
+# Use the CUDA version shipped with the PyTorch cu128 wheel so local CUDA
+# extensions, including pointnet2_ops, can be compiled for RTX 50 (sm_120).
+# Remove forward-compatibility libraries; the host driver is newer than CUDA 12.8.
 RUN rm -rf /usr/local/cuda/compat
 ENV LANG=en_US.UTF-8
 ENV TZ=Asia/Tokyo
@@ -59,8 +58,12 @@ RUN apt update && apt install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # ---- ROS2 Jazzy Install ----
-RUN curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg && \
-    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(lsb_release -cs) main" > /etc/apt/sources.list.d/ros2.list
+# ---- ROS 2 apt source and signing key ----
+RUN curl -fsSL \
+    https://github.com/ros-infrastructure/ros-apt-source/releases/download/1.2.0/ros2-apt-source_1.2.0.noble_all.deb \
+    -o /tmp/ros2-apt-source.deb && \
+    dpkg -i /tmp/ros2-apt-source.deb && \
+    rm -f /tmp/ros2-apt-source.deb
 
 RUN apt update && apt install -y --no-install-recommends \
     ros-jazzy-desktop \
@@ -86,29 +89,25 @@ RUN { \
 # which was removed in setuptools 80.
 RUN pip install --ignore-installed "setuptools<80" wheel ninja
 
-# ---- PyTorch (upstream, CUDA 12.1) ----
-# cu121 bundles CUDA 12.1 runtime in the wheel. Driver 535 natively supports
-# CUDA 12.2 >= 12.1, so Minor Version Compatibility succeeds. Using 12.6 wheels
-# fails on consumer GPUs (no Forward Compat).
+# ---- PyTorch (upstream, CUDA 12.8) ----
 RUN pip install \
-    torch==2.4.0 \
-    torchvision==0.19.0 \
-    --index-url https://download.pytorch.org/whl/cu121
+    torch==2.7.1 \
+    torchvision==0.22.1 \
+    --index-url https://download.pytorch.org/whl/cu128
 
 # ---- PyTorch Geometric extensions (pre-built wheels matching upstream torch) ----
 RUN pip install \
     torch-cluster torch-scatter \
-    -f https://data.pyg.org/whl/torch-2.4.0+cu121.html
+    -f https://data.pyg.org/whl/torch-2.7.0+cu128.html
 
 # ---- GraspGen dependencies ----
-# Constraints pin torch/torchvision so --ignore-installed (needed for apt-managed
-# zipp/six/etc) does not re-resolve transitive deps and replace our pinned
-# torch 2.6.0+cu126 with the latest upstream torch (which would pull in CUDA 13).
-RUN echo 'torch==2.4.0+cu121' > /tmp/constraints.txt && \
-    echo 'torchvision==0.19.0+cu121' >> /tmp/constraints.txt && \
+# Constraints pin a Blackwell-compatible PyTorch build. RTX 50-series GPUs
+# require sm_120 kernels, which are not present in the older cu121 wheel.
+RUN echo 'torch==2.7.1+cu128' > /tmp/constraints.txt && \
+    echo 'torchvision==0.22.1+cu128' >> /tmp/constraints.txt && \
     echo 'setuptools<80' >> /tmp/constraints.txt && \
     pip install --ignore-installed -c /tmp/constraints.txt \
-    --extra-index-url https://download.pytorch.org/whl/cu121 \
+    --extra-index-url https://download.pytorch.org/whl/cu128 \
     diffusers==0.11.1 \
     timm==1.0.15 \
     huggingface-hub==0.25.2 \
@@ -158,22 +157,36 @@ WORKDIR /ros2_ws/src/GraspGen/pointnet2_ops
 RUN pip install --no-build-isolation -v .
 
 # ---- GraspGen install ----
-# --no-deps: GraspGen pins torch==2.1.0 which conflicts with the installed torch 2.4
+# --no-deps: GraspGen pins torch==2.1.0 which conflicts with the installed torch 2.7
 WORKDIR /ros2_ws/src/GraspGen
 RUN pip install --no-deps -e .
 
 # ---- Python dependencies ----
-# Same constraints pattern as layer 9 to keep torch pinned while --ignore-installed.
-RUN echo 'torch==2.4.0+cu121' > /tmp/constraints.txt && \
-    echo 'torchvision==0.19.0+cu121' >> /tmp/constraints.txt && \
+# Keep the Blackwell-compatible PyTorch build while installing spconv.
+RUN echo 'torch==2.7.1+cu128' > /tmp/constraints.txt && \
+    echo 'torchvision==0.22.1+cu128' >> /tmp/constraints.txt && \
     echo 'setuptools<80' >> /tmp/constraints.txt && \
     pip install --ignore-installed -c /tmp/constraints.txt \
-    --extra-index-url https://download.pytorch.org/whl/cu121 \
+    --extra-index-url https://download.pytorch.org/whl/cu128 \
     spconv-cu124 && \
     rm /tmp/constraints.txt
-RUN pip uninstall -y numpy scikit-learn
-RUN pip install numpy==1.26.4
-RUN pip install --no-cache-dir scikit-learn
+# Ubuntu's NumPy is installed by apt and has no pip RECORD file. Remove only
+# previous pip wheels from /usr/local, then install a mutually compatible set;
+# leaving the NumPy 2.x binary modules in place causes ABI import failures.
+RUN rm -rf \
+        /usr/local/lib/python3.12/dist-packages/numpy \
+        /usr/local/lib/python3.12/dist-packages/numpy-*.dist-info \
+        /usr/local/lib/python3.12/dist-packages/h5py \
+        /usr/local/lib/python3.12/dist-packages/h5py-*.dist-info \
+        /usr/local/lib/python3.12/dist-packages/scipy \
+        /usr/local/lib/python3.12/dist-packages/scipy-*.dist-info \
+        /usr/local/lib/python3.12/dist-packages/sklearn \
+        /usr/local/lib/python3.12/dist-packages/scikit_learn-*.dist-info && \
+    pip install --no-cache-dir --ignore-installed \
+    numpy==1.26.4 \
+    h5py==3.10.0 \
+    scipy==1.13.1 \
+    scikit-learn==1.5.1
 
 # ---- Re-pin setuptools<80 as the final state ----
 # Earlier pip installs pulled setuptools 80+ as a transitive dep of upstream
